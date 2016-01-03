@@ -79,11 +79,16 @@ namespace UserManagementSystem.Controllers
         {
             if (ModelState.IsValid)
             {
-                if (BCryptHelper.CheckPassword(userLVM.Password + "*)&h9", db.Users.First(u => u.Username == userLVM.Username).Password))
+                if (db.Users.Any(x => x.Username == userLVM.Username))
                 {
-                    FormsAuthentication.SetAuthCookie(userLVM.Username, false);
-                    return RedirectToAction("Index", "Home");
+                    if (BCryptHelper.CheckPassword(userLVM.Password + "*)&h9", db.Users.First(u => u.Username == userLVM.Username).Password))
+                    {
+                        FormsAuthentication.SetAuthCookie(userLVM.Username, false);
+                        return RedirectToAction("Index", "Home");
+                    }
                 }
+
+                ModelState.AddModelError("", "Invalid username/password.");
             }
             return View(userLVM);
         }
